@@ -39,6 +39,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("")
   const [copied, setCopied] = useState(false)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const { socket } = useMatchmaking(userProfile?.id || null)
 
   const [matchData, setMatchData] = useState<any>(null)
 
@@ -56,6 +57,28 @@ export default function ChatPage() {
       router.push('/login')
     }
   }, [authLoading, userProfile, router])
+
+  // Listen for match ended event globally
+  useEffect(() => {
+    if (!socket) return;
+    
+    const handleMatchEnded = (data: any) => {
+      if (String(data.matchId) === roomId) {
+        toast({
+          title: "Match Ended",
+          description: "This match has been ended by a participant.",
+          variant: "destructive"
+        })
+        router.push("/find-players")
+      }
+    }
+    
+    socket.on('match:ended', handleMatchEnded)
+    
+    return () => {
+      socket.off('match:ended', handleMatchEnded)
+    }
+  }, [socket, roomId, router, toast])
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {

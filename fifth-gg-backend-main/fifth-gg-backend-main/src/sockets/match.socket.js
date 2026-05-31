@@ -95,14 +95,11 @@ module.exports = (io, socket) => {
 
             // Notify all participants about acceptance
             match.participants.forEach((participant) => {
-                const socketId = userSockets.get(participant.user_id);
-                if (socketId) {
-                    io.to(socketId).emit("match:player_accepted", {
-                        matchId,
-                        userId,
-                        allAccepted: match.participants.every(p => p.status === "accepted"),
-                    });
-                }
+                io.to(`user_${participant.user_id}`).emit("match:player_accepted", {
+                    matchId,
+                    userId,
+                    allAccepted: match.participants.every(p => p.status === "accepted"),
+                });
             });
 
             // If all accepted, start the match
@@ -110,10 +107,7 @@ module.exports = (io, socket) => {
                 await matchService.updateMatchStatus(matchId, "active");
 
                 match.participants.forEach((participant) => {
-                    const socketId = userSockets.get(participant.user_id);
-                    if (socketId) {
-                        io.to(socketId).emit("match:started", { matchId, match });
-                    }
+                    io.to(`user_${participant.user_id}`).emit("match:started", { matchId, match });
                 });
             }
 
@@ -134,13 +128,10 @@ module.exports = (io, socket) => {
 
             // Notify all participants that match was cancelled
             match.participants.forEach((participant) => {
-                const socketId = userSockets.get(participant.user_id);
-                if (socketId) {
-                    io.to(socketId).emit("match:cancelled", {
-                        matchId,
-                        reason: "Player declined",
-                    });
-                }
+                io.to(`user_${participant.user_id}`).emit("match:cancelled", {
+                    matchId,
+                    reason: "Player declined",
+                });
             });
 
             console.log(`User ${userId} declined match ${matchId}`);
@@ -159,13 +150,10 @@ module.exports = (io, socket) => {
             // Notify all participants that match was ended
             if (match && match.participants) {
                 match.participants.forEach((participant) => {
-                    const socketId = userSockets.get(participant.user_id);
-                    if (socketId) {
-                        io.to(socketId).emit("match:ended", {
-                            matchId,
-                            userId, // User who ended it
-                        });
-                    }
+                    io.to(`user_${participant.user_id}`).emit("match:ended", {
+                        matchId,
+                        userId, // User who ended it
+                    });
                 });
             }
 
