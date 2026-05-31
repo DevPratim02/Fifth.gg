@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 import { Mail, ArrowRight, Loader2 } from "lucide-react"
-import { forgotPassword } from "@/lib/api"
+import { resetPassword } from "@/lib/firebase"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ForgotPasswordPage() {
@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
         setIsLoading(true)
 
         try {
-            await forgotPassword(email)
+            await resetPassword(email)
             toast({
                 title: "Reset link sent",
                 description: "Check your email for instructions to reset your password.",

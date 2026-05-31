@@ -49,7 +49,7 @@ export default function SignupPage() {
                 title: "Welcome to Fifth.gg!",
                 description: "Your account has been created successfully",
             })
-            router.push("/find-players")
+            router.push("/onboarding")
         } catch (error: any) {
             console.error("Signup error:", error)
             let errorMessage = "Failed to create account"
