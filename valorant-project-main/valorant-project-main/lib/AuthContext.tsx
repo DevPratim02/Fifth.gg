@@ -36,6 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(firebaseUser);
 
             if (firebaseUser) {
+                setLoading(true);
                 try {
                     // Login or register with backend
                     const response = await loginOrRegister();
