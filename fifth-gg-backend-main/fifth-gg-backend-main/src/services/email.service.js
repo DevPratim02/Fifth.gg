@@ -18,9 +18,9 @@ async function sendWelcomeEmail(email) {
 
     const html = `
       <div style="font-family: Arial, sans-serif; color: #fff; background-color: #111; padding: 20px;">
-        <h1 style="color: #ff4655;">Welcome to Fifth.gg!</h1>
-        <p>Target acquired. You have been verified and are ready to deploy.</p>
-        <p>Complete your profile to find your squad. We verify all agents to ensure the highest quality matches.</p>
+        <h1 style="color: #ff4655;">Hi, welcome to Fifth.gg!</h1>
+        <p>You have been verified and are ready to deploy.</p>
+        <p>Complete your profile to find your fifth. We verify all agents to ensure the highest quality matches.</p>
         <br>
         <a href="https://fifth.gg/onboarding" style="background-color: #ff4655; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">INITIALIZE PROTOCOL</a>
       </div>
