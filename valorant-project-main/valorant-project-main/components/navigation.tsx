@@ -33,25 +33,30 @@ export function Navigation() {
   useEffect(() => {
     if (!socket || !userProfile) return
 
-    const handleNewMessage = (msg: any) => {
-      // Only count messages from others
-      if (msg.userId !== userProfile.id) {
-        setUnreadCount(prev => prev + 1)
-        setRecentMessages(prev => [msg, ...prev].slice(0, 5)) // Keep last 5 messages
+    const handleNewMessage = (data: any) => {
+      // The backend sends { type: "new_message", matchId, message: { ... } }
+      if (data.type === "new_message") {
+        const msg = data.message;
+        
+        // Only count messages from others
+        if (msg.userId !== userProfile.id) {
+          setUnreadCount(prev => prev + 1)
+          setRecentMessages(prev => [msg, ...prev].slice(0, 5)) // Keep last 5 messages
 
-        // Show toast notification
-        toast({
-          title: `New message from ${msg.username}`,
-          description: msg.text?.substring(0, 50) + (msg.text?.length > 50 ? '...' : ''),
-          duration: 4000,
-        })
+          // Show toast notification
+          toast({
+            title: `New message from ${msg.username}`,
+            description: msg.text?.substring(0, 50) + (msg.text?.length > 50 ? '...' : ''),
+            duration: 4000,
+          })
+        }
       }
     }
 
-    socket.on('chat:message', handleNewMessage)
+    socket.on('global:notification', handleNewMessage)
 
     return () => {
-      socket.off('chat:message', handleNewMessage)
+      socket.off('global:notification', handleNewMessage)
     }
   }, [socket, userProfile, toast])
 

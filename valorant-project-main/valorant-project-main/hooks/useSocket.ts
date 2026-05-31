@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-export const useSocket = () => {
+export const useSocket = (userId?: number | null) => {
     const [isConnected, setIsConnected] = useState(false);
     const socketRef = useRef<Socket | null>(null);
 
@@ -42,6 +42,13 @@ export const useSocket = () => {
         };
     }, []);
 
+    // Identify user globally
+    useEffect(() => {
+        if (isConnected && userId && socketRef.current) {
+            socketRef.current.emit('user:identify', userId);
+        }
+    }, [isConnected, userId]);
+
     return {
         socket: socketRef.current,
         isConnected,
@@ -50,7 +57,7 @@ export const useSocket = () => {
 
 // Matchmaking hook
 export const useMatchmaking = (userId: number | null) => {
-    const { socket, isConnected } = useSocket();
+    const { socket, isConnected } = useSocket(userId);
     const [matchStatus, setMatchStatus] = useState<'idle' | 'searching' | 'found' | 'accepted' | 'started'>('idle');
     const [currentMatch, setCurrentMatch] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
@@ -162,7 +169,7 @@ export const useMatchmaking = (userId: number | null) => {
 
 // Chat hook
 export const useChat = (roomId: string | null, userId: number | null, username: string | null) => {
-    const { socket, isConnected } = useSocket();
+    const { socket, isConnected } = useSocket(userId);
     const [messages, setMessages] = useState<any[]>([]);
     const [typingUsers, setTypingUsers] = useState<string[]>([]);
 

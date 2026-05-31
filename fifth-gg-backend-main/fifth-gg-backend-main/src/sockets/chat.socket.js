@@ -1,4 +1,5 @@
 const chatService = require("../services/chat.service");
+const matchService = require("../services/match.service");
 
 module.exports = (io, socket) => {
     // Join a chat room
@@ -44,6 +45,24 @@ module.exports = (io, socket) => {
             io.to(roomId).emit("chat:message", messageData);
 
             console.log(`Message saved in room ${roomId} for user ${userId}`);
+
+            // Send Global Notifications to other participants
+            try {
+                const match = await matchService.getMatchById(roomId);
+                if (match && match.participants) {
+                    match.participants.forEach(participant => {
+                        if (String(participant.user_id) !== String(userId)) {
+                            io.to(`user_${participant.user_id}`).emit("global:notification", {
+                                type: "new_message",
+                                matchId: roomId,
+                                message: messageData
+                            });
+                        }
+                    });
+                }
+            } catch (notifyErr) {
+                console.error("Failed to send global notification:", notifyErr);
+            }
         } catch (err) {
             console.error("Error saving message:", err);
             // Send error back to sender
